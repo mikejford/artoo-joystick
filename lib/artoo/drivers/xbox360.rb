@@ -51,6 +51,14 @@ module Artoo
         }
       }
 
+      def currently_pressed?(b)
+        if button_map.has_value?(b)
+          button_values[button_map.key(b)]
+        else
+          super b
+        end
+      end
+
       def handle_joystick
         x0 = connection.axis(axis_map[:j0_x])
         y0 = connection.axis(axis_map[:j0_y])
@@ -58,7 +66,7 @@ module Artoo
 
         x1 = connection.axis(axis_map[:j1_x])
         y1 = connection.axis(axis_map[:j1_y])
-        publish_joystick(1, x1, y1)        
+        publish_joystick(1, x1, y1)
 
         handle_trigger
       end
@@ -78,7 +86,11 @@ module Artoo
       end
 
       def publish_button(b)
-        publish(event_topic_name("button_#{button_map[b]}"))
+        if button_values[b] == 1
+          publish(event_topic_name("button_#{button_map[b]}"))
+        else
+          publish(event_topic_name("button_up_#{button_map[b]}"))
+        end
         super
       end
 
